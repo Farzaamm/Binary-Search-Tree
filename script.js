@@ -53,8 +53,84 @@ const Tree = array => {
         }
         
     };
+
+    const remove = value => {
+        if(!root) return root;
+        let pointer = root;
+        let parent = null;
+        while(pointer){
+            if(value < pointer.data){
+                parent = pointer;
+                pointer = pointer.left
+            }
+            else if(value > pointer.data){
+                parent = pointer;
+                pointer = pointer.right;
+            }else{
+                if(!pointer.right && !pointer.left){
+                    if(pointer === parent.left) return parent.left = null;
+                    if(pointer === parent.right) return parent.right = null;
+                }
+                if(!pointer.left){
+                    if(pointer === parent.left) return parent.left = pointer.right
+                    if(pointer === parent.right) return parent.right = pointer.right
+                }else if(!pointer.right){
+                    if(pointer === parent.left) return parent.left = pointer.left
+                    if(pointer === parent.right) return parent.right = pointer.left
+                }else{
+                    let replacingNode = pointer.right;
+                    let replacingParent = pointer;
+                    while(replacingNode.left){
+                        replacingParent = replacingNode;
+                        replacingNode = replacingNode.left;
+                    }
+                    if(pointer === root){
+                        replacingNode.right = root.right;
+                        replacingNode.left = root.left;
+                        root = replacingNode;
+                        if(replacingNode === replacingParent.left) return replacingParent.left = null;
+                        if(replacingNode === replacingParent.right) return replacingParent.right = null;
+
+                    }
+                    if(pointer === parent.left){
+                        if(replacingNode === pointer.left){
+                            replacingNode.left = null;
+                        }else{
+                            replacingNode.left = pointer.left;
+                        }
+                        if(replacingNode === pointer.right){
+                            replacingNode.right = null;
+                        }else{
+                            replacingNode.right = pointer.right;
+                        }
+                        parent.left = replacingNode;
+                        if(replacingNode === replacingParent.left) return replacingParent.left = null;
+                        if(replacingNode === replacingParent.right) return replacingParent.right = null;
+                    } 
+                    if(pointer === parent.right){
+                        if(replacingNode === pointer.left){
+                            replacingNode.left = null;
+                        }else{
+                            replacingNode.left = pointer.left;
+                        }
+                        if(replacingNode === pointer.right){
+                            replacingNode.right = null;
+                        }else{
+                            replacingNode.right = pointer.right;
+                        }
+                        parent.right = replacingNode;  
+                        if(replacingNode === replacingParent.left) return replacingParent.left = null;
+                        if(replacingNode === replacingParent.right) return replacingParent.right = null;
+                    } 
+                }    
+            }
+        }
+    };
     
-    
+    const find = value => {
+        if(value === root.data) return root;
+    }
+
     const prettyPrint = (node = root, prefix = '', isLeft = true) => {
         if(node){
             if (node.right !== null) {
@@ -71,17 +147,15 @@ const Tree = array => {
     
     
     let root = buildTree(array, 0, array.length - 1);
-    return {root, prettyPrint, insert}
+    return {root, prettyPrint, insert, remove, find}
 };
 
 
 
 let a = [2,4,5,3,9,7,3,8,5];
 let b = [];
-let c = [1,2,4,5,6,7];
 let f = Tree(a);
 let d = Tree(b);
-let e = Tree(c);
 
 // d.insert(4)
 // d.insert(8)
@@ -91,7 +165,11 @@ let e = Tree(c);
 // d.insert(7)
 // d.prettyPrint()
 
-f.insert(1) 
-f.prettyPrint()
-// e.prettyPrint()
-// console.log(d.root)
+// f.insert(1) 
+// f.prettyPrint()
+// f.remove(8)
+// f.prettyPrint()
+f.find(5)
+console.log(f.find(5))
+
+
