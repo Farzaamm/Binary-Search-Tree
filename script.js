@@ -127,8 +127,103 @@ const Tree = array => {
         }
     };
     
-    const find = value => {
-        if(value === root.data) return root;
+    const find = (value, pointer = root) => {
+        if(value === pointer.data) return pointer;
+        if(value < pointer.data){
+            if(!pointer.left) return null;
+            return find(value, pointer.left);
+        }
+        if(value > pointer.data){
+            if(!pointer.right) return null;
+            return find(value, pointer.right);
+        }
+    }
+
+    const levelOrder = (callback) => {
+        if(!root) return [];
+        let result = [];
+        let queue = [root];
+        while(queue.length > 0){
+            let current = queue.shift();
+            callback ? callback(current) : result.push(current.data)
+            if(current.left) queue.push(current.left);
+            if(current.right) queue.push(current.right);
+        }
+        return {result, callback};
+    }
+
+    const inorder = (pointer = root, callback) => {
+        if(!pointer) return [];
+        const leftSide = inorder(pointer.left, callback);
+        const rightSide = inorder(pointer.right, callback);
+        if(callback) callback(pointer);
+        return [...leftSide, pointer.data, ...rightSide]
+    }
+
+    const preorder = (pointer = root, callback) => {
+        if(!pointer) return [];
+        const leftSide = preorder(pointer.left, callback);
+        const rightSide = preorder(pointer.right, callback);
+        if(callback) callback(pointer);
+        return [pointer.data, ...leftSide, ...rightSide]
+    }
+
+    const postorder = (pointer = root, callback) => {
+        if(!pointer) return [];
+        const leftSide = postorder(pointer.left, callback);
+        const rightSide = postorder(pointer.right, callback);
+        if(callback) callback(pointer);
+        return [...leftSide, ...rightSide, pointer.data]
+    }
+
+    const height = (node = root) => {
+        // return it's height. Height is defined as the number of edges in longest path from a given node to a leaf node.
+        const heightCalculator = (foundNode = find(node)) => {
+            if(!foundNode) return -1;
+            return Math.max(heightCalculator(foundNode.left), heightCalculator(foundNode.right)) + 1;
+        }
+        return heightCalculator();
+    }
+
+    const depth = (node, pointer = root) => {
+        //return it's depth. Depth is defined as the number of edges in path from a given node to the tree’s root node.
+        let edge = 0;
+        if(!pointer) return edge;
+        while(pointer){
+            if(node === pointer.data) return edge;
+            if(node < pointer.data){
+                edge++;
+                pointer = pointer.left
+            }else{
+                edge++;
+                pointer = pointer.right
+            }
+        }
+    }
+
+    const isBalanced = (pointer = root) => {
+        if(!pointer) return false;
+        let leftSide = isBalanced(pointer.left);
+        let rightSide = isBalanced(pointer.right);
+        if(!pointer.left && !pointer.right){
+            return true;
+        }else if(!pointer.left && pointer.right || pointer.left && !pointer.right){
+            if(height(pointer.data) > 1){
+                return false;
+            }else{
+                return true
+            }
+        }else{
+            if(leftSide && rightSide){
+                if(Math.abs(height(pointer.left.data) - height(pointer.right.data)) <= 1) return true;
+            }
+        }
+        return leftSide && rightSide;
+    }
+
+    const rebalance = () => {
+        let arrayedTree = inorder(); // returns an array of the tree nodes
+        return root = buildTree(arrayedTree, 0, arrayedTree.length - 1)
     }
 
     const prettyPrint = (node = root, prefix = '', isLeft = true) => {
@@ -147,8 +242,12 @@ const Tree = array => {
     
     
     let root = buildTree(array, 0, array.length - 1);
-    return {root, prettyPrint, insert, remove, find}
+    return {root, prettyPrint, insert, remove, find, levelOrder, inorder, preorder, postorder, height, depth, isBalanced, rebalance}
 };
+
+const print = (node) => {
+    console.log(`Node data is ${node.data}`)
+}
 
 
 
@@ -165,11 +264,29 @@ let d = Tree(b);
 // d.insert(7)
 // d.prettyPrint()
 
-// f.insert(1) 
+f.insert(1) 
+f.insert(10) 
+f.insert(20) 
+f.insert(30) 
+f.insert(50) 
+f.insert(580) 
+f.insert(15) 
+f.insert(1.5) 
+f.insert(1.6) 
+f.insert(1.7) 
 // f.prettyPrint()
 // f.remove(8)
 // f.prettyPrint()
-f.find(5)
-console.log(f.find(5))
+// console.log(f.find(57))
+// console.log(f.levelOrder())
+// console.log(f.levelOrder(print))
+// console.log(f.postorder())
+// console.log(f.depth(1))
+// console.log(f.height(93))
+// console.log(d.height(8))
+// console.log(f.isBalanced())
+// console.log(d.isBalanced())
+f.rebalance()
+f.prettyPrint()
 
 
